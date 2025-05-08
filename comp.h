@@ -25,6 +25,8 @@
 #define nodI_cisupp(c) ((c) >= 'A' && (c) <= 'Z')
 #define nodI_cisalp(c) (nodI_cislow((c)) || nodI_cisupp((c)))
 #define nodI_cisanm(c) (nodI_cisalp((c)) || nodI_cisnum((c)))
+#define nodI_cisidt(c) (nodI_cisalp((c)) || (c) == '_' || (c) == '$')
+#define nodI_cisidn(c) (nodI_cisidt((c)) || nodI_cisnum((c)))
 
 
 /* Source loc. */
@@ -36,7 +38,9 @@ enum TokType {
   TK_UNKNOWN,
   TK_EOF,
   TK_NEWLN,
-  TK_DELIM
+  TK_DELIM,
+  TK_IDENT,
+  TK_END
 };
 
 struct Token {

@@ -13,6 +13,17 @@
 #include "comp.h"
 
 
+#define kwds_len (sizeof(kwds)/sizeof(struct kwd))
+struct kwd {
+  char     *keystr;
+  enum TokType type;
+};
+
+static struct kwd kwds[] = {
+  {"end", TK_END}
+};
+
+
 void nodI_linit (struct Lexer *l, char *src)
 {
   l->pos = 0;
@@ -51,6 +62,39 @@ static char nextc (struct Lexer *l)
 }
 
 
+/* alt for strcmp. */
+static char compare(char *a, char *b, sloc len)
+{
+  sloc i;
+  char x, d;
+  for (i = 0; i < len; i++) {
+    x = *a++;
+    d = x - *b++;
+    if (d != 0)
+      return d;
+    if (x == 0)
+      return 0;
+  }
+  return d;
+}
+
+
+/*
+ * Returns 1 if 't' is a keyword.
+ */
+static enum TokType iskwd(char *t, sloc tlen)
+{
+  int i;
+  for (i = 0; i < kwds_len; i++)
+    if (compare((char*)kwds[i].keystr, t, tlen) == 0)
+      return kwds[i].type;
+  return TK_NONE;
+}
+
+
+/*
+ * Process the next token.
+ */
 static struct Token tokenize (struct Lexer *l)
 {
   struct Token tok;
@@ -62,7 +106,7 @@ static struct Token tokenize (struct Lexer *l)
     c = nextc(l);
     /* skip spaces (except line/cr) */
     if (nodI_ciswsp(c)) {
-      while (nodI_ciswsp(c)) {
+      for (;nodI_ciswsp(c);) {
         inc(l);
         c = nextc(l);
       }
@@ -70,7 +114,7 @@ static struct Token tokenize (struct Lexer *l)
     }
     /* skip comments */
     if (c == '#') {
-      while (!nodI_cislin(c) && c != '\0') {
+      for (;!nodI_cislin(c) && c != '\0';) {
         inc(l);
         c = nextc(l);
       }
@@ -81,7 +125,7 @@ static struct Token tokenize (struct Lexer *l)
     tok.col = l->col;
     tok.text = &l->src[l->pos];
     tok.this_ln = l->curr_ln;
-    tok.len = 1;
+    tok.len = 0;
     /* eof */
     if (nodI_cisnul(c)) {
       inc(l);
@@ -104,7 +148,20 @@ static struct Token tokenize (struct Lexer *l)
       tok.len = 1;
       break;
     }
+    /* ids & kwds */
+    if (nodI_cisidt(c)) {
+      for (;nodI_cisidn(c);) {
+        inc(l);
+        c = nextc(l);
+        tok.len++;
+      }
+      tok.tt = iskwd(tok.text, tok.len);
+      if (tok.tt == TK_NONE)
+        tok.tt = TK_IDENT;
+      break;
+    }
     /* unknown */
+    tok.len++;
     l->end = 1;
     break;
   }
