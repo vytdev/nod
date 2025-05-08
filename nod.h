@@ -27,6 +27,7 @@
 typedef struct NOD NOD;
 
 typedef void * (* nod_allocfn_t) (void *, unsigned long);
+typedef unsigned long nod_sz_t;
 
 
 #if defined(__cplusplus)
@@ -42,6 +43,11 @@ NOD *nod_open (nod_allocfn_t fn);
  * Close a nod instance.
  */
 void nod_close (NOD *N);
+
+/*
+ * Load a bytecode.
+ */
+void nod_load (NOD *N, void *code, nod_sz_t sz);
 
 #if defined(__cplusplus)
 } /* extern "C" */
