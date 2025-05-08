@@ -8,11 +8,11 @@
  */
 
 #if !defined(NOD_INTERNAL)
-#  error "nod/front.h is for internal-use only. Please use nod/nod.h instead"
+#  error "nod/comp.h is for internal-use only. Please use nod/nod.h instead"
 #endif
 
-#ifndef NOD_FRONT_H_
-#define NOD_FRONT_H_   1
+#ifndef NOD_COMP_H_
+#define NOD_COMP_H_   1
 #include "nod.h"
 #include "core.h"
 
@@ -59,4 +59,4 @@ struct Token *nodI_lcurr (struct Lexer *l);
 struct Token *nodI_lnext (struct Lexer *l);
 struct Token *nodI_lpeek (struct Lexer *l);
 
-#endif /* NOD_FRONT_H_ */
+#endif /* NOD_COMP_H_ */

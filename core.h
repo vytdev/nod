@@ -31,6 +31,7 @@ struct NOD {
   nod_sz_t  codesz;
 };
 
+
 #define nodI_malloc(N, s)     ((N)->alloc_fn(NULL, (s)))
 #define nodI_mfree(N, p)      ((N)->alloc_fn((p), 0))
 #define nodI_mresize(N, p, s) ((N)->alloc_fn((p), (s)))

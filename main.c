@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define NOD_INTERNAL
-#include "front.h"
+#include "comp.h"
 
 
 static void printtok (struct Token *tok)

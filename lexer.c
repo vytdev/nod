@@ -10,7 +10,7 @@
 /*#include "nod.h"*/
 
 #define NOD_INTERNAL
-#include "front.h"
+#include "comp.h"
 
 
 void nodI_linit (struct Lexer *l, char *src)
