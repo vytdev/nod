@@ -20,7 +20,7 @@ CORE-TRG:=  libnod.a
 SRC:=  main.c
 OBJ:=  $(SRC:.c=.o)
 TRG:=  nod
-DYNLIBS=
+DYN:=
 
 DEP:=  .depend
 
@@ -44,7 +44,7 @@ debug: LDFLAGS+= -g
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(TRG): $(OBJ) $(CORE-OBJ)
-	$(CC) $(LDFLAGS) -o $@ $^ $(DYNLIBS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(DYN)
 
 $(CORE-TRG): $(CORE-OBJ)
 	$(AR) $@ $?
