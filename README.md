@@ -1,3 +1,3 @@
 # nod
 
-An embedded scripting language.
+A Lua-inspired, embedded scripting language.

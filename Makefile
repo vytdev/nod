@@ -13,7 +13,7 @@ LDFLAGS=
 CFLAGS+=  $(MYCFLAGS) -std=$(STD)
 LDFLAGS+= $(MYLDFLAGS)
 
-CORE-SRC:=  nod.c
+CORE-SRC:=  nod.c lexer.c
 CORE-OBJ:=  $(CORE-SRC:.c=.o)
 CORE-TRG:=  libnod.a
 
