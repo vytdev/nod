@@ -24,7 +24,8 @@
 
 
 /* nod state. */
-typedef struct NOD NOD;
+typedef struct NOD  NOD;
+typedef signed int  nod_integer_t;
 
 typedef void * (* nod_allocfn_t) (void *, unsigned long);
 typedef unsigned long nod_sz_t;

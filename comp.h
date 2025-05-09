@@ -7,10 +7,6 @@
  * Repo:  https://github.com/vytdev/nod
  */
 
-#if !defined(NOD_INTERNAL)
-#  error "nod/comp.h is for internal-use only. Please use nod/nod.h instead"
-#endif
-
 #ifndef NOD_COMP_H_
 #define NOD_COMP_H_   1
 #include "nod.h"

@@ -79,3 +79,20 @@ void nodI_stfree (NOD *N, nod_sz_t sz)
   else
     N->s_top -= sz;
 }
+
+
+void nodI_pushint (NOD *N, nod_integer_t val)
+{
+  struct TValue *tv;
+  tv = (struct TValue *)nodI_stalloc(N, sizeof(struct TValue));
+  tv->v.i = val;
+  tv->tt = VT_INTEGER;
+}
+
+
+nod_integer_t nodI_popint (NOD *N)
+{
+  struct TValue tv = *getstack(N, struct TValue);
+  nodI_stfree(N, sizeof(struct TValue));
+  return tv.v.i;
+}
