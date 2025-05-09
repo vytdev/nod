@@ -7,7 +7,7 @@
  * Repo:  https://github.com/vytdev/nod
  */
 
-/*#include "nod.h"*/
+#include "nod.h"
 
 #define NOD_INTERNAL
 #include "comp.h"
@@ -160,6 +160,23 @@ static struct Token tokenize (struct Lexer *l)
         tok.tt = TK_IDENT;
       break;
     }
+    /* numbers */
+    if (nodI_cisnum(c)) {
+      for (;nodI_cisnum(c);) {
+        inc(l);
+        c = nextc(l);
+        tok.len++;
+      }
+      tok.tt = TK_INTEGER;
+      break;
+    }
+    /* ops */
+    if (c == '+') {
+      inc(l);
+      tok.len = 1;
+      tok.tt = TK_PLUS;
+      break;
+    }
     /* unknown */
     tok.len++;
     l->end = 1;
@@ -198,4 +215,16 @@ struct Token *nodI_lpeek (struct Lexer *l)
   if (l->lkahead.tt != TK_NONE)
     l->lkahead = tokenize(l);
   return &l->lkahead;
+}
+
+
+nod_integer_t nodI_parseint (char *v)
+{
+  char c;
+  nod_integer_t res;
+  for (res = 0; nodI_cisnum(c = *v);) {
+    res *= 10;
+    res += c - '0';
+  }
+  return res;
 }

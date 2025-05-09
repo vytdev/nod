@@ -36,7 +36,9 @@ enum TokType {
   TK_NEWLN,
   TK_DELIM,
   TK_IDENT,
-  TK_END
+  TK_END,
+  TK_INTEGER,
+  TK_PLUS
 };
 
 struct Token {
@@ -58,5 +60,7 @@ int nodI_lisactive (struct Lexer *l);
 struct Token *nodI_lcurr (struct Lexer *l);
 struct Token *nodI_lnext (struct Lexer *l);
 struct Token *nodI_lpeek (struct Lexer *l);
+
+nod_integer_t nodI_parseint (char *v);
 
 #endif /* NOD_COMP_H_ */
