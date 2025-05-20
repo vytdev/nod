@@ -8,6 +8,8 @@ size_t get_file_size (FILE *fp);
 size_t read_file_buffed (FILE *fp, void *out, size_t len);
 char *read_file (const char *path, size_t *sz);
 
+void fatal_err (char *fmt, ...);
+
 struct BumpArena
 {
   struct BumpArena *next;

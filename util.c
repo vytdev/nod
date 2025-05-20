@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,12 +56,21 @@ err:
   return NULL;
 }
 
+void fatal_err (char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
+  exit(1);
+}
+
 struct BumpArena *bar_new (size_t sz)
 {
   struct BumpArena *bar = (struct BumpArena*)malloc(
               sizeof(struct BumpArena)-1+sz);
   if (!bar)
-    return NULL;
+    fatal_err("Out of memory!\n");
   bar->next = NULL;
   bar->size = sz;
   bar->pos = 0;

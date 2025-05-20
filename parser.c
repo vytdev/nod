@@ -30,8 +30,6 @@ struct AstNode *parse_num (struct Lexer *l, struct BumpArena *bar)
   struct Token *tk;
   struct AstNode *node;
   node = (struct AstNode*)bar_alloc(bar, sizeof(struct AstNode));
-  if (!node)
-    return NULL;
   tk = lex_curr(l);
   if (tk->tt != TK_LNUM) {
     lex_print_token(tk, "Expected number literal.\n");
@@ -71,8 +69,6 @@ struct AstNode *parse_bin_op (struct Lexer *l, struct BumpArena *bar,
     return NULL;
   for (;;) {
     binval = (struct AstNode*)bar_alloc(bar, sizeof(struct AstNode));
-    if (!binval)
-      return NULL;
     binval->type = AT_BIN_OP;
 
     tk = lex_curr(l);

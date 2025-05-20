@@ -29,7 +29,7 @@ struct AstNum
 enum AstType
 {
   AT_BIN_OP,
-  AT_NUM,
+  AT_NUM
 };
 
 struct AstNode
