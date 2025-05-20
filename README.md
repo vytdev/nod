@@ -1,6 +1,6 @@
 # nod
 
-A nice embedded scripting language.
+A nice statically-typed language.
 
 ## License
 
