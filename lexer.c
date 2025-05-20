@@ -56,6 +56,8 @@ struct Token *lex_peek (struct Lexer *l)
 
 struct Token *lex_curr (struct Lexer *l)
 {
+  if (l->curr.tt == TK_NONE)
+    l->curr = tokenize(l);
   return &l->curr;
 }
 
@@ -169,6 +171,20 @@ static struct Token tokenize (struct Lexer *l)
       tk.tt = TK_EOF;
       tk.len = 1;
       l->is_end = vtrue;
+      break;
+    }
+
+    if (c == '+') {
+      tk.tt = TK_PLUS;
+      tk.len = 1;
+      inc(l);
+      break;
+    }
+
+    if (c == '-') {
+      tk.tt = TK_DASH;
+      tk.len = 1;
+      inc(l);
       break;
     }
 

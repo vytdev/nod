@@ -10,7 +10,7 @@ CFLAGS=   -Wall -Wpedantic
 CFLAGS+=  $(MYCFLAGS) -std=$(STD)
 LDFLAGS+= $(MYLDFLAGS)
 
-SRC= lexer.c main.c util.c
+SRC= lexer.c main.c parser.c util.c
 OBJ= $(SRC:.c=.o)
 TRG= nod
 

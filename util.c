@@ -54,3 +54,38 @@ err_file:
 err:
   return NULL;
 }
+
+struct BumpArena *bar_new (size_t sz)
+{
+  struct BumpArena *bar = (struct BumpArena*)malloc(
+              sizeof(struct BumpArena)-1+sz);
+  if (!bar)
+    return NULL;
+  bar->next = NULL;
+  bar->size = sz;
+  bar->pos = 0;
+  return bar;
+}
+
+void bar_free (struct BumpArena *bar)
+{
+  if (!bar)
+    return;
+  bar_free(bar->next);
+  free(bar);
+}
+
+void *bar_alloc (struct BumpArena *bar, size_t sz)
+{
+  if (!bar)
+    return NULL;
+  bar_align(bar, 8);
+  if (bar->size - bar->pos >= sz) {
+    void *ptr = &bar->data[bar->pos];
+    bar->pos += sz;
+    return ptr;
+  }
+  if (!bar->next)
+    bar->next = bar_alloc(bar, bar->size * 2 + sz);
+  return bar_alloc(bar->next, sz);
+}

@@ -18,6 +18,8 @@ enum TokType
   TK_UNKNOWN,
   TK_EOF,
   TK_LNUM,
+  TK_PLUS,
+  TK_DASH
 };
 
 struct Token
