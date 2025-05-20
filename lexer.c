@@ -155,6 +155,16 @@ static struct Token tokenize (struct Lexer *l)
     tk.text  = &l->src[l->pos];
     tk.fname = l->fname;
 
+    if (isdigit(c)) {
+      while (isdigit(c)) {
+        inc(l);
+        c = getc(l);
+        tk.len++;
+      }
+      tk.tt = TK_LNUM;
+      break;
+    }
+
     if (c == '\0') {
       tk.tt = TK_EOF;
       tk.len = 1;

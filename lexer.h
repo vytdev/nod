@@ -17,6 +17,7 @@ enum TokType
   TK_NONE,     /* pseudo-token */
   TK_UNKNOWN,
   TK_EOF,
+  TK_LNUM,
 };
 
 struct Token
