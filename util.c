@@ -69,10 +69,11 @@ struct BumpArena *bar_new (size_t sz)
 
 void bar_free (struct BumpArena *bar)
 {
-  if (!bar)
-    return;
-  bar_free(bar->next);
-  free(bar);
+  while (bar) {
+    struct BumpArena *next = bar->next;
+    free(bar);
+    bar = next;
+  }
 }
 
 void *bar_alloc (struct BumpArena *bar, size_t sz)
@@ -86,6 +87,6 @@ void *bar_alloc (struct BumpArena *bar, size_t sz)
     return ptr;
   }
   if (!bar->next)
-    bar->next = bar_alloc(bar, bar->size * 2 + sz);
+    bar->next = bar_new(bar->size * 2 + sz);
   return bar_alloc(bar->next, sz);
 }
