@@ -9,13 +9,13 @@
 #define getc(l)  ((l)->src[(l)->pos])
 
 /* increment the current lexical position for the current character. */
-static void inc (struct Lexer *l);
+static void inc (Lexer *l);
 
 /* process the next token. */
-static struct Token tokenize (struct Lexer *l);
+static Token tokenize (Lexer *l);
 
 
-void lex_init (struct Lexer *l)
+void lex_init (Lexer *l)
 {
   l->curr.tt = l->lkah.tt = TK_NONE;
   l->len = 0;
@@ -27,7 +27,7 @@ void lex_init (struct Lexer *l)
   l->is_end = vtrue;   /* init-ed but not ready */
 }
 
-void lex_load_file (struct Lexer *l, char *src, size_t len, char *name)
+void lex_load_file (Lexer *l, char *src, size_t len, char *name)
 {
   l->curr_ln = l->src = src;
   l->len = len;
@@ -36,7 +36,7 @@ void lex_load_file (struct Lexer *l, char *src, size_t len, char *name)
   l->is_end = vfalse;
 }
 
-struct Token *lex_next (struct Lexer *l)
+Token *lex_consume (Lexer *l)
 {
   if (l->lkah.tt != TK_NONE) {
     l->curr = l->lkah;
@@ -47,26 +47,26 @@ struct Token *lex_next (struct Lexer *l)
   return &l->curr;
 }
 
-struct Token *lex_peek (struct Lexer *l)
+Token *lex_peek (Lexer *l)
 {
   if (l->lkah.tt == TK_NONE)
     l->lkah = tokenize(l);
   return &l->lkah;
 }
 
-struct Token *lex_curr (struct Lexer *l)
+Token *lex_curr (Lexer *l)
 {
   if (l->curr.tt == TK_NONE)
     l->curr = tokenize(l);
   return &l->curr;
 }
 
-bool_t lex_has_ended (struct Lexer *l)
+bool_t lex_has_ended (Lexer *l)
 {
   return l->is_end;
 }
 
-void lex_print_token (struct Token *tk, char *fmt, ...)
+void lex_print_token (Token *tk, char *fmt, ...)
 {
   sloc_t i;
 
@@ -113,7 +113,7 @@ void lex_print_token (struct Token *tk, char *fmt, ...)
   putc('\n', stdout);
 }
 
-static void inc (struct Lexer *l)
+static void inc (Lexer *l)
 {
   switch (l->src[l->pos++]) {
     case '\n':
@@ -131,9 +131,9 @@ static void inc (struct Lexer *l)
   }
 }
 
-static struct Token tokenize (struct Lexer *l)
+static Token tokenize (Lexer *l)
 {
-  struct Token tk;
+  Token tk;
   char c;
 
   if (l->is_end)

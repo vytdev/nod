@@ -11,6 +11,9 @@
 
 typedef size_t sloc_t;
 
+typedef struct Token Token;
+typedef struct Lexer Lexer;
+
 
 enum TokType
 {
@@ -40,24 +43,24 @@ struct Lexer
 };
 
 /* setup the lexer. */
-void lex_init (struct Lexer *l);
+void lex_init (Lexer *l);
 
 /* setup a file for a lexer. */
-void lex_load_file (struct Lexer *l, char *src, size_t len, char *name);
+void lex_load_file (Lexer *l, char *src, size_t len, char *name);
 
-/* get the next token. consume the current one. */
-struct Token *lex_next (struct Lexer *l);
+/* consume the current token. returns the next one */
+Token *lex_consume (Lexer *l);
 
 /* peek to the next token. */
-struct Token *lex_peek (struct Lexer *l);
+Token *lex_peek (Lexer *l);
 
 /* get the current token. */
-struct Token *lex_curr (struct Lexer *l);
+Token *lex_curr (Lexer *l);
 
 /* returns true when the lexer already has ended. */
-bool_t lex_has_ended (struct Lexer *l);
+bool_t lex_has_ended (Lexer *l);
 
 /* prints a token to stdout. */
-void lex_print_token (struct Token *tk, char *fmt, ...);
+void lex_print_token (Token *tk, char *fmt, ...);
 
 #endif /* NOD_LEXER_H_ */

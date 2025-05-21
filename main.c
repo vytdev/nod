@@ -11,9 +11,8 @@ int main (int argc, char **argv)
 {
   char *data;
   size_t sz;
-  struct Lexer l;
-  struct BumpArena *bar;
-  struct AstNode *expr;
+  Parser P;
+  Expr *expr;
 
   if (argc < 2) {
     fprintf(stderr, "usage: %s FILE\n", argv[0]);
@@ -26,28 +25,20 @@ int main (int argc, char **argv)
     return 1;
   }
 
-  lex_init(&l);
-  lex_load_file(&l, data, sz, argv[1]);
+  parser_init(&P);
+  lex_load_file(&P.l, data, sz, argv[1]);
 
-  bar = bar_new(4096);
-  if (!bar) {
-    printf("out of memory\n");
-    return 1;
-  }
+  expr = parse_expr(&P);
+  if (!expr)
+    fatal_err("Parse failed\n");
 
-  expr = parse_expr(&l, bar);
-  if (!expr) {
-    printf("Parse failed\n");
-    bar_free(bar);
-    return 1;
-  }
   print_expr(expr);
   putc('\n', stdout);
 
-  if (!lex_has_ended(&l))
+  if (!lex_has_ended(&P.l))
     printf("Error: extra tokens\n");
 
-  bar_free(bar);
+  parser_free(&P);
   free(data);
   return 0;
 }

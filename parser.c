@@ -2,7 +2,6 @@
 
 #include "lexer.h"
 #include "parser.h"
-#include "util.h"
 
 struct BinOpInfo
 {
@@ -17,24 +16,42 @@ static struct BinOpInfo bin_info[BOP_bin_cnt] = {
 
 #define get_prec(op) (bin_info[(op)].prec)
 #define get_asoc(op) (bin_info[(op)].asc)
+#define alloc(t)  ((t*)bar_alloc(P->bar, sizeof(t)))
+#define curr()    (lex_curr(&P->l))
+#define consume() (lex_consume(&P->l))
+#define peek()    (lex_peek(&P->l))
 
-/* returns `enum BinOpType` for token `tk`. */
-static enum BinOpType get_bin_op (struct Token *tk);
+/* returns `BinOpType` for token `tk`. */
+static BinOpType get_bin_op (Token *tk);
 
 
-struct AstNode *parse_num (struct Lexer *l, struct BumpArena *bar)
+void parser_init (Parser *P)
+{
+  lex_init(&P->l);
+  P->bar = bar_new(1<<16); /* 64kB */
+}
+
+void parser_free (Parser *P)
+{
+  bar_free(P->bar);
+  P->bar = NULL;
+}
+
+Expr *parse_num (Parser *P)
 {
   char *txt;
   size_t len;
   signed long val;
-  struct Token *tk;
-  struct AstNode *node;
-  node = (struct AstNode*)bar_alloc(bar, sizeof(struct AstNode));
-  tk = lex_curr(l);
+  Token *tk;
+  Expr *node;
+  node = alloc(Expr);
+
+  tk = curr();
   if (tk->tt != TK_LNUM) {
     lex_print_token(tk, "Expected number literal.\n");
     return NULL;
   }
+
   len = tk->len;
   txt = tk->text;
   val = 0;
@@ -44,34 +61,36 @@ struct AstNode *parse_num (struct Lexer *l, struct BumpArena *bar)
     txt++;
     len--;
   }
-  lex_next(l);
+  consume();
+
   node->type = AT_NUM;
   node->val.num.tok = *tk;
   node->val.num.val = val;
   return node;
 }
 
-struct AstNode *parse_atom (struct Lexer *l, struct BumpArena *bar)
+Expr *parse_atom (Parser *P)
 {
   /* TODO: add parenthesis, and other literals */
-  return parse_num(l, bar);
+  return parse_num(P);
 }
 
-struct AstNode *parse_bin_op (struct Lexer *l, struct BumpArena *bar,
-                              int min_prec)
+Expr *parse_bin_op (Parser *P, int min_prec)
 {
-  struct Token *tk;
-  struct AstNode *left, *right, *binval;
-  enum BinOpType op;
+  Token *tk;
+  Expr *left, *right, *binval;
+  BinOpType op;
   int prec;
-  left = parse_atom(l, bar);
+
+  left = parse_atom(P);
   if (!left)
     return NULL;
+
   for (;;) {
-    binval = (struct AstNode*)bar_alloc(bar, sizeof(struct AstNode));
+    binval = alloc(Expr);
     binval->type = AT_BIN_OP;
 
-    tk = lex_curr(l);
+    tk = curr();
     op = get_bin_op(tk);
     binval->val.bin_op.tok = *tk;
     binval->val.bin_op.type = op;
@@ -82,9 +101,9 @@ struct AstNode *parse_bin_op (struct Lexer *l, struct BumpArena *bar,
     if (prec < min_prec)
       break;
 
-    lex_next(l);
-    right = parse_bin_op(l, bar, get_asoc(op) == ASC_LEFT
-                    ? min_prec + 1 : min_prec);
+    consume();
+    right = parse_bin_op(P, get_asoc(op) == ASC_LEFT
+                            ? min_prec + 1 : min_prec);
     if (!right)
       return NULL;
 
@@ -95,12 +114,12 @@ struct AstNode *parse_bin_op (struct Lexer *l, struct BumpArena *bar,
   return left;
 }
 
-struct AstNode *parse_expr (struct Lexer *l, struct BumpArena *bar)
+Expr *parse_expr (Parser *P)
 {
-  return parse_bin_op(l, bar, 0);
+  return parse_bin_op(P, 0);
 }
 
-void print_expr (struct AstNode *node)
+void print_expr (Expr *node)
 {
   if (!node) {
     printf("NULL");
@@ -124,7 +143,7 @@ void print_expr (struct AstNode *node)
   }
 }
 
-static enum BinOpType get_bin_op (struct Token *tk)
+static BinOpType get_bin_op (Token *tk)
 {
   switch (tk->tt) {
     case TK_PLUS: return BOP_ADD;

@@ -4,57 +4,74 @@
 #include "lexer.h"
 #include "util.h"
 
-enum BinOpType
+typedef struct BinOp       BinOp;
+typedef struct NumLiteral  NumLiteral;
+typedef struct Expr        Expr;
+
+typedef struct Parser      Parser;
+
+typedef enum
 {
   BOP_ADD = 0,
   BOP_SUB = 1,
   BOP_bin_cnt,
   BOP_unknown
+} BinOpType;
+
+struct BinOp
+{
+  Token     tok;
+  BinOpType type;
+  Expr     *left;
+  Expr     *right;
 };
 
-struct AstBinOp
+struct NumLiteral
 {
-  struct Token     tok;
-  enum BinOpType   type;
-  struct AstNode  *left;
-  struct AstNode  *right;
-};
-
-struct AstNum
-{
-  struct Token tok;
+  Token tok;
   signed long  val;
 };
 
-enum AstType
+typedef enum
 {
   AT_BIN_OP,
   AT_NUM
-};
+} ExprType;
 
-struct AstNode
+struct Expr
 {
-  enum AstType  type;
+  ExprType    type;
   union {
-    struct AstNum    num;
-    struct AstBinOp  bin_op;
+    NumLiteral  num;
+    BinOp       bin_op;
   } val;
 };
 
+struct Parser
+{
+  Lexer l;
+  struct BumpArena *bar;
+};
+
+/* init a parser. */
+void parser_init (Parser *P);
+
+/* release mem used by parser. */
+void parser_free (Parser *P);
+
 /* parse number literals. */
-struct AstNode *parse_num (struct Lexer *l, struct BumpArena *bar);
+Expr *parse_num (Parser *P);
 
 /* parse literals, parenthesis, etc. */
-struct AstNode *parse_atom (struct Lexer *l, struct BumpArena *bar);
+Expr *parse_atom (Parser *P);
 
 /* parse binary ops. */
-struct AstNode *parse_bin_op (struct Lexer *l, struct BumpArena *bar,
-                              int min_prec);
+Expr *parse_bin_op (Parser *p, int min_prec);
 
 /* parse an expression. */
-struct AstNode *parse_expr (struct Lexer *l, struct BumpArena *bar);
+Expr *parse_expr (Parser *p);
 
 /* print the expr, for debugging. */
-void print_expr (struct AstNode *node);
+void print_expr (Expr *node);
 
 #endif /* NOD_PARSER_H_ */
