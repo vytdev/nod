@@ -21,6 +21,18 @@ static struct BinOpInfo bin_info[BOP_bin_cnt] = {
 #define consume() (lex_consume(&P->l))
 #define peek()    (lex_peek(&P->l))
 
+/* parse number literals. */
+static Expr *parse_num (Parser *P);
+
+/* parse parenthesis. */
+static Expr *parse_paren (Parser *P);
+
+/* parse literals, parenthesis, etc. */
+static Expr *parse_atom (Parser *P);
+
+/* parse binary ops. */
+static Expr *parse_bin_op (Parser *p, int min_prec);
+
 /* returns `BinOpType` for token `tk`. */
 static BinOpType get_bin_op (Token *tk);
 
@@ -37,7 +49,36 @@ void parser_free (Parser *P)
   P->bar = NULL;
 }
 
-Expr *parse_num (Parser *P)
+Expr *parse_expr (Parser *P)
+{
+  return parse_bin_op(P, 0);
+}
+
+void print_expr (Expr *node)
+{
+  if (!node) {
+    printf("NULL");
+    return;
+  }
+  switch (node->type) {
+    case AT_BIN_OP:
+      putc('(', stdout);
+      print_expr(node->val.bin_op.left);
+      putc(' ', stdout);
+      fwrite(node->val.bin_op.tok.text, 1, node->val.bin_op.tok.len, stdout);
+      putc(' ', stdout);
+      print_expr(node->val.bin_op.right);
+      putc(')', stdout);
+      break;
+    case AT_NUM:
+      printf("%li", node->val.num.val);
+      break;
+    default:
+      printf("<\?\?>");
+  }
+}
+
+static Expr *parse_num (Parser *P)
 {
   char *txt;
   size_t len;
@@ -69,13 +110,37 @@ Expr *parse_num (Parser *P)
   return node;
 }
 
-Expr *parse_atom (Parser *P)
+static Expr *parse_paren (Parser *P)
 {
-  /* TODO: add parenthesis, and other literals */
-  return parse_num(P);
+  Token *tk;
+  Expr *node;
+  consume();
+  node = parse_expr(P);
+  if (!node)
+    return NULL;
+  tk = curr();
+  if (tk->tt != TK_RPAREN) {
+    lex_print_token(tk, "Expected closing parenthesis.\n");
+    return NULL;
+  }
+  consume();
+  return node;
 }
 
-Expr *parse_bin_op (Parser *P, int min_prec)
+static Expr *parse_atom (Parser *P)
+{
+  Token *tk = curr();
+  switch (tk->tt) {
+    case TK_LNUM:    return parse_num(P);
+    case TK_LPAREN:  return parse_paren(P);
+    /* TODO: other literals */
+    default:
+      lex_print_token(tk, "Unexpected token.\n");
+      return NULL;
+  }
+}
+
+static Expr *parse_bin_op (Parser *P, int min_prec)
 {
   Token *tk;
   Expr *left, *right, *binval;
@@ -112,35 +177,6 @@ Expr *parse_bin_op (Parser *P, int min_prec)
     left = binval;
   }
   return left;
-}
-
-Expr *parse_expr (Parser *P)
-{
-  return parse_bin_op(P, 0);
-}
-
-void print_expr (Expr *node)
-{
-  if (!node) {
-    printf("NULL");
-    return;
-  }
-  switch (node->type) {
-    case AT_BIN_OP:
-      putc('(', stdout);
-      print_expr(node->val.bin_op.left);
-      putc(' ', stdout);
-      fwrite(node->val.bin_op.tok.text, 1, node->val.bin_op.tok.len, stdout);
-      putc(' ', stdout);
-      print_expr(node->val.bin_op.right);
-      putc(')', stdout);
-      break;
-    case AT_NUM:
-      printf("%li", node->val.num.val);
-      break;
-    default:
-      printf("<\?\?>");
-  }
 }
 
 static BinOpType get_bin_op (Token *tk)

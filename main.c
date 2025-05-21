@@ -19,7 +19,7 @@ int main (int argc, char **argv)
     return 1;
   }
 
-  data = read_file(argv[1], &sz);
+  data = read_ascii_file(argv[1], &sz);
   if (!data) {
     printf("Failed to read file: %s\n", argv[1]);
     return 1;

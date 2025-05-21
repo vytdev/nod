@@ -167,30 +167,17 @@ static Token tokenize (Lexer *l)
       break;
     }
 
-    if (c == '\0') {
-      tk.tt = TK_EOF;
-      tk.len = 1;
-      l->is_end = vtrue;
-      break;
-    }
-
-    if (c == '+') {
-      tk.tt = TK_PLUS;
-      tk.len = 1;
-      inc(l);
-      break;
-    }
-
-    if (c == '-') {
-      tk.tt = TK_DASH;
-      tk.len = 1;
-      inc(l);
-      break;
-    }
-
-    /* unknown token */
     tk.len = 1;
-    l->is_end = vtrue;
+    inc(l);
+    switch (c) {
+      case '\0': tk.tt = TK_EOF;     l->is_end = vtrue; break;
+      case '+':  tk.tt = TK_PLUS;     break;
+      case '-':  tk.tt = TK_DASH;     break;
+      case '(':  tk.tt = TK_LPAREN;   break;
+      case ')':  tk.tt = TK_RPAREN;   break;
+      default:   tk.tt = TK_UNKNOWN; l->is_end = vtrue;
+    }
+
     break;
   }
 

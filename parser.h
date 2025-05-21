@@ -59,15 +59,6 @@ void parser_init (Parser *P);
 /* release mem used by parser. */
 void parser_free (Parser *P);
 
-/* parse number literals. */
-Expr *parse_num (Parser *P);
-
-/* parse literals, parenthesis, etc. */
-Expr *parse_atom (Parser *P);
-
-/* parse binary ops. */
-Expr *parse_bin_op (Parser *p, int min_prec);
-
 /* parse an expression. */
 Expr *parse_expr (Parser *p);
 

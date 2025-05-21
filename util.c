@@ -20,10 +20,11 @@ size_t read_file_buffed (FILE *fp, void *out, size_t len)
 {
   const int BUFF_SZ = 4096;
   size_t pos = 0, rdneed, rdgot;
-  for (;;) {
+  while (len) {
     rdneed = len > BUFF_SZ ? BUFF_SZ : len;
     rdgot = fread(((char*)out) + pos, sizeof(char), rdneed, fp);
     pos += rdgot;
+    len -= rdgot;
     if (rdneed != rdgot)
       break;
   }
@@ -47,6 +48,33 @@ char *read_file (const char *path, size_t *sz)
   fclose(fp);
   if (sz)
     *sz = len;
+  return mem;
+err_mem:
+  free(mem);
+err_file:
+  fclose(fp);
+err:
+  return NULL;
+}
+
+char *read_ascii_file (const char *path, size_t *sz)
+{
+  FILE *fp;
+  size_t len;
+  char *mem;
+  fp = fopen(path, "rb");
+  if (!fp)
+    goto err;
+  len = get_file_size(fp);
+  mem = (char*)malloc(sizeof(char) * (len + 1));
+  if (!mem)
+    goto err_file;
+  if (read_file_buffed(fp, mem, len) != len)
+    goto err_mem;
+  fclose(fp);
+  if (sz)
+    *sz = len + 1;
+  mem[len] = '\0';
   return mem;
 err_mem:
   free(mem);

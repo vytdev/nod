@@ -22,7 +22,9 @@ enum TokType
   TK_EOF,
   TK_LNUM,
   TK_PLUS,
-  TK_DASH
+  TK_DASH,
+  TK_LPAREN,  /* ( */
+  TK_RPAREN   /* ) */
 };
 
 struct Token
